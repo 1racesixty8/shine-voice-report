@@ -13,7 +13,7 @@ The QR code does not open a website. It starts a phone call.
 
 ## 2. Vapi answers the phone call
 
-The phone number is connected to the Vapi voice agent currently configured for the Example Supportive Housing Property SHINE pilot.
+The phone number is connected to the agency's Vapi voice agent for the SHINE workflow.
 
 Vapi handles:
 
@@ -193,13 +193,13 @@ That means:
 
 The recipient inbox receives a plain-text incident report email.
 
-For the current pilot, that inbox is:
+For local examples, that inbox is:
 
 ```text
 reports@example.org
 ```
 
-For DISH management later, they can change the email destination by updating this Vercel environment variable:
+Each agency can change the email destination by updating this hosting environment variable:
 
 ```text
 MANAGEMENT_EMAILS=their-management-email@example.com
@@ -246,10 +246,10 @@ The main failure points are:
 - `MANAGEMENT_EMAILS` is wrong.
 - Vercel environment variables are missing.
 
-## 16. Current verified status
+## 16. Local validation status
 
-As of the most recent check, the Vercel backend still works:
+Before publishing this template, these local checks were completed:
 
 - `/health` returned HTTP `200`
 - `/vapi-webhook` accepted test payloads
-- A test email was successfully sent through Gmail SMTP
+- Sample report formatting was verified

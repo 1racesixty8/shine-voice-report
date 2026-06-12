@@ -49,22 +49,22 @@ The backend is a small Node/Express webhook. It receives Vapi end-of-call report
 
 5. Make a test call and verify the report email arrives.
 
-## 3. Update email recipients after sale
+## 3. Update email recipients
 
-The buyer does not need to edit code. They only update environment variables in the backend hosting dashboard.
+The adopting agency does not need to edit code. They only update environment variables in the backend hosting dashboard.
 
 Change the destination address:
 
 ```text
-MANAGEMENT_EMAILS=reports@dishmanagement.org
+MANAGEMENT_EMAILS=reports@example.org
 ```
 
 If management wants the email to come from their own domain or Gmail account, also update:
 
 ```text
-SMTP_USER=reports@dishmanagement.org
+SMTP_USER=reports@example.org
 SMTP_PASS=NEW_APP_PASSWORD_OR_SMTP_SECRET
-FROM_EMAIL="SHINE Voice Reports <reports@dishmanagement.org>"
+FROM_EMAIL="SHINE Voice Reports <reports@example.org>"
 ```
 
 Then redeploy/restart the backend.

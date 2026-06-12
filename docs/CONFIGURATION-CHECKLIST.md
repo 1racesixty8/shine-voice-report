@@ -10,7 +10,7 @@
 
 ## Vapi
 
-- [ ] Import or recreate the assistant prompt from `vapi/vapi-assistant-config.json`.
+- [ ] Import or recreate the assistant prompt from `vapi/vapi-assistant-config.example.json`.
 - [ ] Connect the phone number to the assistant.
 - [ ] Enable transcripts/end-of-call report artifacts.
 - [ ] Set the Server URL to the deployed backend `/vapi-webhook` URL.
@@ -26,7 +26,7 @@
 
 ## Flyer
 
-- [ ] Use only `flyer-assets/SHINE-Voice-Report-Final-Flyer.png` for this Example Supportive Housing Property pilot.
+- [ ] Customize the flyer template for the agency property, phone number, and QR code.
 - [ ] Confirm the printed phone number is correct.
 - [ ] Confirm the QR code opens the phone dialer for the same number.
 - [ ] Print and test with at least one iPhone and one Android phone.

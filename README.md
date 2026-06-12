@@ -22,10 +22,10 @@ This project is for supportive housing agencies, resident services teams, proper
 ## What is included
 
 ```text
-backend/      Node/Express webhook for Vapi end-of-call reports
-vapi/         Example Vapi assistant prompt/configuration
-flyer-assets/ Example pilot flyer image
-docs/         Setup, operations, and adoption guides
+backend/       Node/Express webhook for Vapi end-of-call reports
+vapi/          Example Vapi assistant prompt/configuration
+flyer-assets/  Example flyer image template
+docs/          Setup, operations, and adoption guides
 ```
 
 ## Requirements

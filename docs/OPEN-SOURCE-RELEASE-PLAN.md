@@ -147,7 +147,7 @@ Because SHINE handles incident reports, transcripts, and possibly caller phone n
 7. Add a strong README.
 8. Initialize Git.
 9. Push to GitHub.
-10. Share the GitHub link with DISH and other agencies.
+10. Share the GitHub link with supportive housing agencies.
 
 ## Recommended tagline
 
