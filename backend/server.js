@@ -203,7 +203,7 @@ async function sendIncidentEmail(report) {
 }
 
 app.get('/health', (req, res) => {
-  res.json({ ok: true, service: 'pacific-bay-inn-vapi-webhook', timestamp: new Date().toISOString() });
+  res.json({ ok: true, service: 'shine-voice-report-webhook', timestamp: new Date().toISOString() });
 });
 
 app.post('/vapi-webhook', async (req, res) => {

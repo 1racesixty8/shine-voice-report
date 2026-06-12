@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: pacific-bay-inn-vapi-webhook
+    name: shine-voice-report-webhook
     env: node
     plan: free
     buildCommand: npm install

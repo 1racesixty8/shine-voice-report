@@ -218,7 +218,7 @@ curl https://your-backend-domain.example/health
 Expected result:
 
 ```json
-{"ok":true,"service":"pacific-bay-inn-vapi-webhook"}
+{"ok":true,"service":"shine-voice-report-webhook"}
 ```
 
 Send a test report:
