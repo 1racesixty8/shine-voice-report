@@ -1,0 +1,42 @@
+{
+  "message": {
+    "type": "end-of-call-report",
+    "transcript": "Assistant: Hello, this is the Example Supportive Housing Property incident reporter. Please tell me what is happening.\nTenant: My name is Maria. I am in unit 308. There is water leaking from the hallway ceiling near the third floor elevator.\nAssistant: Is it happening right now, and does anyone appear injured or in danger?\nTenant: It is happening now. Nobody is injured, but the floor is getting slippery.\nAssistant: Thank you. Your report will be reviewed by Example Supportive Housing Property management.",
+    "summary": "Tenant reports an active water leak from the hallway ceiling near the third floor elevator. The floor is becoming slippery. No injuries reported.",
+    "analysis": {
+      "structuredData": {
+        "tenantName": "Maria",
+        "role": "Resident",
+        "unit": "308",
+        "confidentialRequested": "No",
+        "incidentDateTime": "Now",
+        "locationInBuilding": "Third floor hallway near elevator",
+        "incidentType": "Hazard / Property Damage",
+        "peopleInvolved": "No known people involved",
+        "outsideAgenciesContacted": "None reported",
+        "staffNotified": "Not yet",
+        "urgency": "High",
+        "description": "Active ceiling leak causing a slippery floor near the third floor elevator."
+      }
+    },
+    "call": {
+      "id": "call_test_12345",
+      "startedAt": "2026-05-18T17:04:00.000Z",
+      "endedAt": "2026-05-18T17:07:20.000Z",
+      "customer": {
+        "number": "+14155550123"
+      },
+      "analysis": {
+        "summary": "Water leak hazard on third floor near elevator.",
+        "structuredData": {
+          "priority": "High"
+        }
+      }
+    },
+    "artifact": {
+      "structuredOutputs": {
+        "source": "Vapi end-of-call report"
+      }
+    }
+  }
+}

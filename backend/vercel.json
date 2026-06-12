@@ -1,0 +1,8 @@
+{
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/health", "destination": "/api/health" },
+    { "source": "/vapi-webhook", "destination": "/api/vapi-webhook" },
+    { "source": "/", "destination": "/index.html" }
+  ]
+}
