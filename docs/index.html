@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="SHINE Voice Report is an open-source, voice-first incident reporting workflow for supportive housing communities."
+    />
+    <title>SHINE Voice Report</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="#top" aria-label="SHINE Voice Report home">
+          <span class="brand-mark" aria-hidden="true">S</span>
+          <span>SHINE Voice Report</span>
+        </a>
+        <div class="nav-links">
+          <a href="#overview">Overview</a>
+          <a href="#audience">Who it’s for</a>
+          <a href="#workflow">How it works</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section id="top" class="hero section">
+        <div class="hero-content">
+          <p class="eyebrow">Supportive Housing Incident Navigation Engine</p>
+          <h1>Voice-first incident reporting for supportive housing communities.</h1>
+          <p class="hero-copy">
+            SHINE Voice Report helps residents report concerns by phone or QR code.
+            A calm Vapi voice assistant gathers the details, then management receives
+            a structured incident report by email.
+          </p>
+          <div class="hero-actions" aria-label="Primary actions">
+            <a class="button button-primary" href="#workflow">See how it works</a>
+            <a class="button button-secondary" href="SETUP-GUIDE.md">Read setup guide</a>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Emergency reminder">
+          <h2>Safety first</h2>
+          <p>
+            SHINE is for incident reporting workflows, not emergency dispatch. If
+            there is immediate danger, call 911 first.
+          </p>
+        </aside>
+      </section>
+
+      <section id="overview" class="section split-section">
+        <div>
+          <p class="eyebrow">Overview</p>
+          <h2>A lower-barrier way to report concerns.</h2>
+        </div>
+        <div class="content-block">
+          <p>
+            SHINE is an open-source workflow for agencies that want residents to
+            report concerns without filling out paper forms or navigating complex
+            portals. Residents speak naturally, and the system turns the call into
+            a written report for staff follow-up.
+          </p>
+          <div class="feature-grid" aria-label="Project components">
+            <article>
+              <h3>Voice assistant</h3>
+              <p>Residents call a number or scan a flyer QR code to reach Vapi.</p>
+            </article>
+            <article>
+              <h3>Webhook backend</h3>
+              <p>A Node/Express backend receives end-of-call reports from Vapi.</p>
+            </article>
+            <article>
+              <h3>Email reports</h3>
+              <p>Management receives summaries, transcripts, and structured fields.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="audience" class="section audience-section">
+        <p class="eyebrow">Who this is for</p>
+        <h2>Built for teams supporting residents and properties.</h2>
+        <div class="audience-grid">
+          <article>
+            <h3>Supportive housing agencies</h3>
+            <p>Offer a simple reporting path for residents who prefer phone calls.</p>
+          </article>
+          <article>
+            <h3>Resident services teams</h3>
+            <p>Receive clear follow-up details without manually transcribing calls.</p>
+          </article>
+          <article>
+            <h3>Property managers</h3>
+            <p>Route incidents to the right inbox with consistent written reports.</p>
+          </article>
+          <article>
+            <h3>Community safety teams</h3>
+            <p>Collect structured context while keeping emergency guidance visible.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="workflow" class="section workflow-section">
+        <div class="section-heading">
+          <p class="eyebrow">How it works</p>
+          <h2>From resident phone call to staff-ready report.</h2>
+        </div>
+        <ol class="timeline" aria-label="SHINE workflow steps">
+          <li>
+            <span>1</span>
+            <div>
+              <h3>Resident starts a call</h3>
+              <p>They call the published phone number or scan a QR code on a flyer.</p>
+            </div>
+          </li>
+          <li>
+            <span>2</span>
+            <div>
+              <h3>Vapi asks calm questions</h3>
+              <p>The assistant gathers key details about what happened and where.</p>
+            </div>
+          </li>
+          <li>
+            <span>3</span>
+            <div>
+              <h3>Backend receives the webhook</h3>
+              <p>When the call ends, Vapi sends the summary, transcript, and fields.</p>
+            </div>
+          </li>
+          <li>
+            <span>4</span>
+            <div>
+              <h3>Management gets an email</h3>
+              <p>Staff receive a structured incident report for review and follow-up.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section id="contact" class="section contact-section">
+        <div>
+          <p class="eyebrow">Contact and links</p>
+          <h2>Start with the documentation, then customize for your agency.</h2>
+          <p>
+            Configure your phone number, assistant prompt, flyer language, report
+            recipients, privacy language, and retention workflow before using SHINE
+            with real resident information.
+          </p>
+        </div>
+        <div class="link-panel" aria-label="Documentation links">
+          <a href="SETUP-GUIDE.md">Setup guide</a>
+          <a href="CONFIGURATION-CHECKLIST.md">Configuration checklist</a>
+          <a href="AGENCY-ADOPTION-GUIDE.md">Agency adoption guide</a>
+          <a href="BACKEND-OPERATION-WALKTHROUGH.md">Backend walkthrough</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>MIT licensed open-source project for supportive housing incident reporting.</p>
+    </footer>
+  </body>
+</html>
