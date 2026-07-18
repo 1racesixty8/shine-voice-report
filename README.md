@@ -1,93 +1,162 @@
 # SHINE Voice Report
 
-SHINE Voice Report is an open-source voice-first incident reporting workflow for supportive housing communities.
+SHINE Voice Report is a voice-first incident reporting system for supportive housing communities. It gives residents a lower-barrier way to report a concern by phone instead of requiring them to complete a paper or online form.
 
-Residents call a phone number or scan a flyer QR code, speak naturally to a Vapi voice assistant, and management receives a structured incident report by email after the call.
+A resident calls the published phone number, or scans a QR code that opens the phone dialer. A Vapi voice assistant asks calm, structured questions and captures the information needed for an incident report. After the call, a backend hosted on Vercel prepares a written report and emails it to the approved management recipients.
 
 SHINE stands for **Supportive Housing Incident Navigation Engine**.
 
 ## Who this is for
 
-This project is for supportive housing agencies, resident services teams, property managers, and community safety teams that want a lower-barrier way for residents to report concerns without filling out paper forms.
+This project is intended for supportive housing agencies, resident services teams, property managers, and community safety teams that need an accessible way for residents to report non-emergency concerns.
 
-## How it works
+SHINE is not an emergency service. If anyone is in immediate danger, call 911 or the appropriate local emergency number first.
 
-1. A resident calls the published phone number or scans a QR code that opens the phone dialer.
-2. Vapi answers the call with a voice assistant.
-3. The assistant asks calm, structured questions about the incident.
-4. When the call ends, Vapi sends an end-of-call webhook to the backend.
-5. The backend extracts the summary, transcript, caller details, and structured fields.
-6. The backend emails management a written incident report.
+## Architecture summary
 
-## What is included
+The production workflow has four main parts:
+
+1. **Vapi voice agent** — Answers the resident's call, follows the approved SHINE conversation, and produces a transcript, summary, structured incident fields, and call metadata.
+2. **Webhook backend** — Vapi sends an end-of-call webhook to the Vercel deployment. The backend confirms that the event is relevant, extracts the report fields, and uses Vapi's authenticated API when it needs protected call artifacts such as the recording.
+3. **Email delivery through Resend** — The backend formats a readable incident report and sends it from the approved SHINE sender domain to the configured management inboxes.
+4. **Vercel hosting** — Vercel hosts the webhook endpoint, health endpoint, and environment variables used by the production instance.
 
 ```text
-backend/       Node/Express webhook for Vapi end-of-call reports
-vapi/          Example Vapi assistant prompt/configuration
-flyer-assets/  Example flyer image template
-docs/          Setup, operations, and adoption guides
+Resident phone call or QR code
+        |
+        v
+Vapi voice assistant
+        |
+        | end-of-call webhook
+        v
+Vercel webhook backend
+        |
+        | authenticated Vapi API request when protected artifacts are needed
+        v
+Structured incident report + recording access
+        |
+        | Resend API
+        v
+Approved management email recipients
 ```
 
-## Requirements
+### Webhook flow
 
-- Vapi account
-- Vapi/Twilio phone number connected to the assistant
-- Hosting provider for the backend, such as Vercel, Render, or Railway
-- Email sender account or SMTP provider
-- Management recipient inbox or distribution list
+1. A resident calls the Vapi-connected phone number.
+2. The Vapi assistant collects the incident details and ends the call.
+3. Vapi sends an `end-of-call-report` event to the deployed webhook URL.
+4. The backend extracts the summary, transcript, caller details, timestamps, and structured report fields.
+5. When the recording or another protected call artifact is needed, the backend requests it from Vapi using server-side authentication. Public recording URLs must not be treated as permanent storage.
+6. The backend creates the incident-report email and sends it through Resend.
+7. Vercel returns a success or failure response to Vapi and records operational logs without intentionally exposing secrets.
 
-## Quick start
-
-1. Copy `backend/.env.example` to `.env` for local testing.
-2. Fill in SMTP and report-recipient settings.
-3. Deploy `backend/` to your hosting provider.
-4. Set the deployed `/vapi-webhook` URL as the Vapi assistant or phone number Server URL.
-5. Place a test call or post `backend/test-payload.json` to the webhook.
-6. Confirm the report email arrives.
-
-## Environment variables
+## Repository structure
 
 ```text
-SMTP_HOST=smtp.gmail.com
+backend/               Node/Express webhook and deployment configuration
+backend/api/           Vercel serverless entry points
+vapi/                  Example Vapi assistant configuration
+flyer-assets/          Example resident-facing flyer asset
+docs/                  Setup, operations, and agency adoption guides
+```
+
+Important entry points:
+
+- `backend/server.js` contains the webhook processing and report formatting logic.
+- `backend/api/vapi-webhook.js` exposes the webhook through Vercel.
+- `backend/api/health.js` exposes the health check.
+- `backend/vercel.json` maps public routes to the Vercel API handlers.
+- `vapi/vapi-assistant-config.example.json` is a redacted example, not a production export.
+
+## Implementation status
+
+The `main` branch currently contains the original public reference backend, which sends mail through Nodemailer/SMTP and reads call data included in the webhook payload. The operating SHINE instance has since moved to Resend for email delivery and to Vapi's authenticated API for protected recording access.
+
+This README documents the current production handoff architecture. Before deploying this repository as the operating instance, confirm that the corresponding Resend and authenticated Vapi changes are present in the deployment branch or port them into this codebase. Do not assume the public `main` branch and the live Vercel deployment are identical.
+
+## Environment variables and API keys
+
+Store all secrets in Vercel project settings or a local untracked `.env` file. Never commit real values, copy them into documentation, or expose them in browser-side code.
+
+### Production handoff variables
+
+| Variable | Purpose | Secret? |
+| --- | --- | --- |
+| `VAPI_API_KEY` | Server-side credential for retrieving protected Vapi call data and recording artifacts | Yes |
+| `RESEND_API_KEY` | Server-side credential used to send incident-report emails through Resend | Yes |
+| `FROM_EMAIL` | Verified SHINE sender name and email address | No, but configure privately |
+| `MANAGEMENT_EMAILS` | One approved recipient or a comma-separated list of management recipients | No, but contains operational contact data |
+| `VAPI_WEBHOOK_SECRET` | Optional shared secret used to validate incoming Vapi webhook requests when webhook authentication is enabled | Yes |
+| `PORT` | Local development port; Vercel supplies its own runtime port | No |
+| `NODE_ENV` | Runtime mode such as `production` | No |
+
+Example names only:
+
+```dotenv
+VAPI_API_KEY=replace_with_vapi_server_key
+RESEND_API_KEY=replace_with_resend_server_key
+FROM_EMAIL="SHINE Voice Report <reports@example.org>"
+MANAGEMENT_EMAILS=manager@example.org
+VAPI_WEBHOOK_SECRET=replace_if_webhook_authentication_is_enabled
+PORT=3000
+NODE_ENV=production
+```
+
+### Variables used by the original public SMTP snapshot
+
+The backend currently committed to `main` expects these older email variables:
+
+```dotenv
+SMTP_HOST=smtp.example.org
 SMTP_PORT=587
 SMTP_USER=reports@example.org
-SMTP_PASS=REPLACE_WITH_APP_PASSWORD_OR_SMTP_SECRET
-FROM_EMAIL="SHINE Voice Reports <reports@example.org>"
+SMTP_PASS=replace_with_smtp_secret
+FROM_EMAIL="SHINE Voice Report <reports@example.org>"
 MANAGEMENT_EMAILS=manager@example.org
 ```
 
-`MANAGEMENT_EMAILS` may contain one address or a comma-separated list.
+These SMTP settings describe the reference snapshot, not the intended Resend-based production architecture. Remove or retain them only according to the backend code actually being deployed.
 
-## Safety and privacy
+## Vercel deployment notes
 
-SHINE can process sensitive resident/community information. Agencies using it should:
+1. Import this GitHub repository into the correct Vercel account and select `backend` as the project root directory.
+2. Add the required environment variables in Vercel for Production, Preview, and Development only where each value is appropriate.
+3. Confirm that the deployment exposes:
+   - `GET /health`
+   - `POST /vapi-webhook`
+4. Set the Vapi assistant or phone number server URL to the production webhook address.
+5. Keep Vercel deployment protection from blocking Vapi's webhook, or configure a supported authenticated path.
+6. Place a controlled test call and confirm the webhook succeeds, the report email is delivered through Resend, and protected recording access works through the authenticated Vapi API.
+7. Review Vercel logs for failures, but do not log API keys, complete resident reports, or recording URLs unnecessarily.
+8. Treat Preview deployments as test systems and do not connect them to the live resident phone number unless explicitly intended.
 
-- Use accounts owned by the agency, not a personal account.
-- Never commit `.env` files or passwords.
-- Avoid putting real transcripts or reports in public repositories.
-- Confirm privacy, consent, retention, and incident-report policies with leadership.
-- Keep the emergency disclaimer visible: if there is immediate danger, call 911 first.
+## Safety, privacy, and operations
 
-## Customization
+SHINE may process sensitive resident and community information. Any agency operating an instance should:
 
-Each agency should customize:
+- Use agency-controlled Vapi, Vercel, Resend, domain, and phone accounts.
+- Limit report recipients to approved staff.
+- Keep transcripts, recordings, API keys, and resident reports out of the repository.
+- Define privacy, consent, retention, deletion, escalation, and emergency procedures before launch.
+- Use authenticated Vapi API requests for protected artifacts instead of relying on old public recording links.
+- Test changes with fictional data before using them with residents.
+- Keep the emergency disclaimer clear: SHINE does not replace 911 or emergency services.
 
-- Property name
-- Phone number
-- Flyer design
-- Vapi assistant prompt
-- Report recipient inbox
-- Emergency language
-- Privacy/consent language
-- Data retention workflow
+## Ownership and intellectual property
 
-## Documentation
+Race Anderson retains all SHINE Voice Report intellectual property; DISH holds a non-exclusive license to operate this instance per the SHINE Voice Report - DISH Agreement.
+
+The repository's published license applies to the code released here. The SHINE name, operating materials, private configurations, agency data, production credentials, and agreement-specific rights must be handled according to their applicable ownership and contract terms.
+
+## Additional documentation
 
 - `docs/SETUP-GUIDE.md`
 - `docs/BACKEND-OPERATION-WALKTHROUGH.md`
 - `docs/CONFIGURATION-CHECKLIST.md`
 - `docs/AGENCY-ADOPTION-GUIDE.md`
+- `SECURITY.md`
+- `CONTRIBUTING.md`
 
 ## License
 
-MIT License. See `LICENSE`.
+See `LICENSE` for the license covering the code published in this repository.
