@@ -2,7 +2,7 @@
 
 SHINE Voice Report is a voice-first incident reporting system for supportive housing communities. It gives residents a lower-barrier way to report a concern by phone instead of requiring them to complete a paper or online form.
 
-A resident calls the published phone number, or scans a QR code that opens the phone dialer. A Vapi voice assistant asks calm, structured questions and captures the information needed for an incident report. After the call, a backend hosted on Vercel prepares a written report and emails it to the approved management recipients.
+A resident calls the published phone number, or scans a QR code that opens the phone dialer. A Vapi voice assistant asks calm, structured questions and captures the information needed for an incident report. After the call, the production backend prepares a written report and emails it to the approved management recipients through Resend.
 
 SHINE stands for **Supportive Housing Incident Navigation Engine**.
 
@@ -17,9 +17,9 @@ SHINE is not an emergency service. If anyone is in immediate danger, call 911 or
 The production workflow has four main parts:
 
 1. **Vapi voice agent** — Answers the resident's call, follows the approved SHINE conversation, and produces a transcript, summary, structured incident fields, and call metadata.
-2. **Webhook backend** — Vapi sends an end-of-call webhook to the Vercel deployment. The backend confirms that the event is relevant, extracts the report fields, and uses Vapi's authenticated API when it needs protected call artifacts such as the recording.
+2. **Webhook backend** — Vapi sends an end-of-call webhook to the production deployment. The backend confirms that the event is relevant, extracts the report fields, and uses Vapi's authenticated API when it needs protected call artifacts such as the recording.
 3. **Email delivery through Resend** — The backend formats a readable incident report and sends it from the approved SHINE sender domain to the configured management inboxes.
-4. **Vercel hosting** — Vercel hosts the webhook endpoint, health endpoint, and environment variables used by the production instance.
+4. **Production hosting** — An agency-controlled Node-compatible host runs the webhook and health endpoints and stores the server-side environment variables.
 
 ```text
 Resident phone call or QR code
@@ -29,7 +29,7 @@ Vapi voice assistant
         |
         | end-of-call webhook
         v
-Vercel webhook backend
+Production webhook backend
         |
         | authenticated Vapi API request when protected artifacts are needed
         v
@@ -48,13 +48,13 @@ Approved management email recipients
 4. The backend extracts the summary, transcript, caller details, timestamps, and structured report fields.
 5. When the recording or another protected call artifact is needed, the backend requests it from Vapi using server-side authentication. Public recording URLs must not be treated as permanent storage.
 6. The backend creates the incident-report email and sends it through Resend.
-7. Vercel returns a success or failure response to Vapi and records operational logs without intentionally exposing secrets.
+7. The production host returns a success or failure response to Vapi and records operational logs without intentionally exposing secrets.
 
 ## Repository structure
 
 ```text
 backend/               Node/Express webhook and deployment configuration
-backend/api/           Vercel serverless entry points
+backend/api/           Legacy serverless entry points retained for compatibility
 vapi/                  Example Vapi assistant configuration
 flyer-assets/          Example resident-facing flyer asset
 docs/                  Setup, operations, and agency adoption guides
@@ -63,20 +63,20 @@ docs/                  Setup, operations, and agency adoption guides
 Important entry points:
 
 - `backend/server.js` contains the webhook processing and report formatting logic.
-- `backend/api/vapi-webhook.js` exposes the webhook through Vercel.
+- `backend/api/vapi-webhook.js` is a legacy serverless adapter for the webhook.
 - `backend/api/health.js` exposes the health check.
-- `backend/vercel.json` maps public routes to the Vercel API handlers.
+- `backend/render.yaml` is an example host configuration; adapt deployment settings to the approved production provider.
 - `vapi/vapi-assistant-config.example.json` is a redacted example, not a production export.
 
 ## Implementation status
 
-The `main` branch currently contains the original public reference backend, which sends mail through Nodemailer/SMTP and reads call data included in the webhook payload. The operating SHINE instance has since moved to Resend for email delivery and to Vapi's authenticated API for protected recording access.
+The `main` branch contains an older public reference backend. The current SHINE production standard uses Resend for email delivery and Vapi's authenticated API for protected recording access.
 
-This README documents the current production handoff architecture. Before deploying this repository as the operating instance, confirm that the corresponding Resend and authenticated Vapi changes are present in the deployment branch or port them into this codebase. Do not assume the public `main` branch and the live Vercel deployment are identical.
+This README documents the current production handoff architecture. Before deploying this repository as the operating instance, confirm that the Resend and authenticated Vapi changes are present in the deployment branch. Do not deploy the older email path as the production configuration.
 
 ## Environment variables and API keys
 
-Store all secrets in Vercel project settings or a local untracked `.env` file. Never commit real values, copy them into documentation, or expose them in browser-side code.
+Store all secrets in the production host's encrypted environment settings or a local untracked `.env` file. Never commit real values, copy them into documentation, or expose them in browser-side code.
 
 ### Production handoff variables
 
@@ -87,7 +87,7 @@ Store all secrets in Vercel project settings or a local untracked `.env` file. N
 | `FROM_EMAIL` | Verified SHINE sender name and email address | No, but configure privately |
 | `MANAGEMENT_EMAILS` | One approved recipient or a comma-separated list of management recipients | No, but contains operational contact data |
 | `VAPI_WEBHOOK_SECRET` | Optional shared secret used to validate incoming Vapi webhook requests when webhook authentication is enabled | Yes |
-| `PORT` | Local development port; Vercel supplies its own runtime port | No |
+| `PORT` | Local development port; the production host may supply its own runtime port | No |
 | `NODE_ENV` | Runtime mode such as `production` | No |
 
 Example names only:
@@ -102,39 +102,24 @@ PORT=3000
 NODE_ENV=production
 ```
 
-### Variables used by the original public SMTP snapshot
+## Production deployment notes
 
-The backend currently committed to `main` expects these older email variables:
-
-```dotenv
-SMTP_HOST=smtp.example.org
-SMTP_PORT=587
-SMTP_USER=reports@example.org
-SMTP_PASS=replace_with_smtp_secret
-FROM_EMAIL="SHINE Voice Report <reports@example.org>"
-MANAGEMENT_EMAILS=manager@example.org
-```
-
-These SMTP settings describe the reference snapshot, not the intended Resend-based production architecture. Remove or retain them only according to the backend code actually being deployed.
-
-## Vercel deployment notes
-
-1. Import this GitHub repository into the correct Vercel account and select `backend` as the project root directory.
-2. Add the required environment variables in Vercel for Production, Preview, and Development only where each value is appropriate.
+1. Deploy the `backend/` application to the agency-approved Node-compatible production host.
+2. Add the required environment variables in the host's encrypted settings for each environment where they are appropriate.
 3. Confirm that the deployment exposes:
    - `GET /health`
    - `POST /vapi-webhook`
 4. Set the Vapi assistant or phone number server URL to the production webhook address.
-5. Keep Vercel deployment protection from blocking Vapi's webhook, or configure a supported authenticated path.
+5. Keep host-level access controls from blocking Vapi's webhook, or configure a supported authenticated path.
 6. Place a controlled test call and confirm the webhook succeeds, the report email is delivered through Resend, and protected recording access works through the authenticated Vapi API.
-7. Review Vercel logs for failures, but do not log API keys, complete resident reports, or recording URLs unnecessarily.
+7. Review production logs for failures, but do not log API keys, complete resident reports, or recording URLs unnecessarily.
 8. Treat Preview deployments as test systems and do not connect them to the live resident phone number unless explicitly intended.
 
 ## Safety, privacy, and operations
 
 SHINE may process sensitive resident and community information. Any agency operating an instance should:
 
-- Use agency-controlled Vapi, Vercel, Resend, domain, and phone accounts.
+- Use agency-controlled Vapi, production hosting, Resend, domain, and phone accounts.
 - Limit report recipients to approved staff.
 - Keep transcripts, recordings, API keys, and resident reports out of the repository.
 - Define privacy, consent, retention, deletion, escalation, and emergency procedures before launch.

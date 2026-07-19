@@ -4,9 +4,9 @@
 
 - [ ] Vapi account created and owned by management.
 - [ ] Phone number purchased or assigned in Vapi/Twilio.
-- [ ] Backend hosting account created, such as Vercel, Render, or Railway.
-- [ ] Email sender account created, preferably a management-owned mailbox.
-- [ ] Gmail App Password or SMTP/API credential created for the sender account.
+- [ ] Agency-controlled production hosting account created.
+- [ ] Resend account and verified sending domain configured.
+- [ ] Resend API key created and stored only in the production host's encrypted environment settings.
 
 ## Vapi
 
@@ -19,7 +19,8 @@
 ## Backend
 
 - [ ] Deploy `backend/` to the hosting platform.
-- [ ] Set all environment variables from `backend/.env.example`.
+- [ ] Set the production environment variables documented in the setup guide.
+- [ ] Confirm `RESEND_API_KEY` and `FROM_EMAIL` use the approved Resend configuration.
 - [ ] Set `MANAGEMENT_EMAILS` to the management recipient address.
 - [ ] Confirm `/health` returns OK.
 - [ ] Send `test-payload.json` to `/vapi-webhook` and verify the email arrives.

@@ -9,7 +9,7 @@ Assign owners for:
 - Vapi account
 - Phone number
 - Backend hosting
-- Sender email or SMTP provider
+- Resend account and verified sending domain
 - Report recipient inbox
 - Flyer approval
 - Privacy and records-retention policy
@@ -26,7 +26,7 @@ If you use a flyer QR code, encode the phone number as a `tel:` link so scanning
 
 ## 4. Deploy the backend
 
-Deploy the `backend/` folder to Vercel, Render, Railway, or another Node-capable host.
+Deploy the `backend/` folder to an agency-approved Node-compatible host.
 
 The important public route is:
 
@@ -36,13 +36,12 @@ The important public route is:
 
 ## 5. Configure email delivery
 
-Use an agency-owned sender account. A shared mailbox or Google Group is better than a personal inbox.
+Use an agency-owned Resend account and a verified sending domain. Use a shared mailbox or distribution list for report recipients instead of a personal inbox.
 
 Set:
 
 ```text
-SMTP_USER=reports@example.org
-SMTP_PASS=app-password-or-smtp-secret
+RESEND_API_KEY=replace_with_resend_server_key
 FROM_EMAIL="SHINE Voice Reports <reports@example.org>"
 MANAGEMENT_EMAILS=manager@example.org
 ```

@@ -12,7 +12,7 @@ Use a two-layer model:
    - Sample flyer template or example flyer
    - Setup docs
    - Test payloads
-   - Deployment examples for Vercel/Render
+   - Provider-neutral deployment guidance
 
 2. **Agency-owned deployment**
    - Each agency uses its own Vapi account
@@ -20,7 +20,7 @@ Use a two-layer model:
    - Each agency uses its own email sender and recipient inbox
    - Each agency owns its hosting and environment variables
 
-This lets you share the system widely without giving away your private Gmail, Vercel, Vapi, or phone-number credentials.
+This lets you share the system widely without giving away your private Resend, hosting, Vapi, or phone-number credentials.
 
 ## Recommended license
 
@@ -50,7 +50,6 @@ backend/
   api/
   package.json
   package-lock.json
-  vercel.json
   test-payload.json
 vapi/
   vapi-assistant-config.example.json
@@ -68,11 +67,11 @@ flyer-assets/
 Do not publish:
 
 - `.env`
-- Gmail App Passwords
-- Vercel tokens
+- Resend API keys
+- Production hosting access tokens
 - Vapi private API keys
 - Twilio credentials
-- Local `.vercel` folders
+- Local hosting-provider metadata folders
 - `node_modules`
 - Private notes
 - Any resident reports, transcripts, recordings, or test data with real names
