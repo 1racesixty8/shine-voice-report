@@ -7,20 +7,21 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "test": "VERCEL=1 node --test",
     "test:webhook": "node server.js --test-payload"
   },
   "keywords": [
     "vapi",
     "incident-report",
     "express",
-    "nodemailer"
+    "resend"
   ],
   "author": "SHINE Voice Report contributors",
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "nodemailer": "^6.9.16",
+    "resend": "^6.1.2",
     "qrcode": "^1.5.4"
   }
 }

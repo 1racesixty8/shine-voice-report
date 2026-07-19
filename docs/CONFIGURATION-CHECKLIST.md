@@ -4,9 +4,9 @@
 
 - [ ] Vapi account created and owned by management.
 - [ ] Phone number purchased or assigned in Vapi/Twilio.
-- [ ] Backend hosting account created, such as Vercel, Render, or Railway.
-- [ ] Email sender account created, preferably a management-owned mailbox.
-- [ ] Gmail App Password or SMTP/API credential created for the sender account.
+- [ ] Agency-controlled production hosting account created.
+- [ ] Resend account and verified sending domain configured.
+- [ ] Resend API key created and stored only in the production host's encrypted environment settings.
 
 ## Vapi
 
@@ -14,15 +14,19 @@
 - [ ] Connect the phone number to the assistant.
 - [ ] Enable transcripts/end-of-call report artifacts.
 - [ ] Set the Server URL to the deployed backend `/vapi-webhook` URL.
+- [ ] Configure the webhook to send the production `VAPI_WEBHOOK_SECRET` in `x-vapi-secret` or a Bearer authorization header.
 - [ ] Place a real test call and verify the assistant collects incident details.
 
 ## Backend
 
 - [ ] Deploy `backend/` to the hosting platform.
-- [ ] Set all environment variables from `backend/.env.example`.
+- [ ] Set the production environment variables documented in the setup guide.
+- [ ] Confirm `RESEND_API_KEY` and `FROM_EMAIL` use the approved Resend configuration.
+- [ ] Confirm `VAPI_API_KEY` and `VAPI_WEBHOOK_SECRET` are stored only in encrypted production settings.
+- [ ] Set `ATTACH_CALL_RECORDINGS=true` if approved recording attachments are required.
 - [ ] Set `MANAGEMENT_EMAILS` to the management recipient address.
 - [ ] Confirm `/health` returns OK.
-- [ ] Send `test-payload.json` to `/vapi-webhook` and verify the email arrives.
+- [ ] Send `test-payload.json` with the webhook secret to `/vapi-webhook` and verify the email arrives.
 
 ## Flyer
 

@@ -17,7 +17,7 @@ Date: June 11, 2026
 
 These README actions are intentionally left for each adopting agency:
 
-- Fill in real SMTP credentials.
+- Add the agency's Resend API key and verified sender address to the production host.
 - Deploy the backend to that agency's hosting provider.
 - Set the agency's Vapi assistant or phone-number Server URL.
 - Place a real phone test call.

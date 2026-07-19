@@ -51,17 +51,17 @@ Current webhook URL:
 https://your-backend-domain.example/vapi-webhook
 ```
 
-This URL is hosted on Vercel.
+This URL is hosted on the agency-approved production platform.
 
-## 5. Vercel receives the webhook
+## 5. The production host receives the webhook
 
-Vercel runs the backend code in `server.js` through the serverless API route in:
+The production host runs the backend code in `server.js` and exposes the webhook route:
 
 ```text
-api/vapi-webhook.js
+POST /vapi-webhook
 ```
 
-Vercel receives the POST request from Vapi at:
+The host receives the POST request from Vapi at:
 
 ```text
 POST /vapi-webhook
@@ -138,9 +138,9 @@ The key function is:
 buildEmailBody(report)
 ```
 
-## 10. Backend sends the email through Gmail SMTP
+## 10. Backend sends the email through Resend
 
-The backend uses Nodemailer and Gmail SMTP.
+The production backend uses the Resend API and the approved SHINE sending domain.
 
 The key function is:
 
@@ -148,15 +148,16 @@ The key function is:
 sendIncidentEmail(report)
 ```
 
-It reads these environment variables from Vercel:
+It reads these environment variables from the production host's encrypted settings:
 
 ```text
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=reports@example.org
-SMTP_PASS=Gmail App Password
+RESEND_API_KEY=replace_with_resend_server_key
 FROM_EMAIL=Example Supportive Housing Property Reports <reports@example.org>
 MANAGEMENT_EMAILS=reports@example.org
+VAPI_API_KEY=replace_with_vapi_server_key
+VAPI_WEBHOOK_SECRET=replace_with_a_random_shared_secret
+ATTACH_CALL_RECORDINGS=true
+VAPI_MAX_RECORDING_BYTES=20971520
 ```
 
 The email currently goes to:
@@ -165,9 +166,9 @@ The email currently goes to:
 reports@example.org
 ```
 
-## 11. Gmail accepts and delivers the message
+## 11. Resend accepts and delivers the message
 
-If the Gmail App Password is valid, Gmail accepts the email and returns a message ID.
+If the Resend API key and verified sender are valid, Resend accepts the email and returns a message ID.
 
 A successful webhook response looks like:
 
@@ -175,7 +176,7 @@ A successful webhook response looks like:
 {
   "ok": true,
   "reportId": "call_test_12345",
-  "messageId": "<...@gmail.com>"
+  "messageId": "resend-message-id"
 }
 ```
 
@@ -187,7 +188,7 @@ That means:
 
 - Vapi reached the backend
 - The backend parsed the report
-- Gmail accepted the outgoing email
+- Resend accepted the outgoing email
 
 ## 13. Management receives the report
 
@@ -226,13 +227,14 @@ Send a test report:
 ```bash
 curl -X POST https://your-backend-domain.example/vapi-webhook \
   -H "Content-Type: application/json" \
+  -H "x-vapi-secret: YOUR_WEBHOOK_SECRET" \
   --data-binary @test-payload.json
 ```
 
 Expected result:
 
 ```json
-{"ok":true,"reportId":"call_test_12345","messageId":"<...@gmail.com>"}
+{"ok":true,"reportId":"call_test_12345","messageId":"resend-message-id"}
 ```
 
 ## 15. What can break
@@ -241,10 +243,11 @@ The main failure points are:
 
 - Vapi phone number is not connected to the assistant.
 - Vapi Server URL is missing or wrong.
-- Vercel deployment protection is accidentally turned on.
-- Gmail App Password is revoked or changed.
+- Host-level access controls block Vapi from reaching the webhook.
+- The Resend API key is missing, revoked, or invalid.
+- The `FROM_EMAIL` sender has not been verified in Resend.
 - `MANAGEMENT_EMAILS` is wrong.
-- Vercel environment variables are missing.
+- Production environment variables are missing.
 
 ## 16. Local validation status
 
