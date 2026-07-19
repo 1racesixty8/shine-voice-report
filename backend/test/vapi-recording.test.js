@@ -130,6 +130,11 @@ test('rejects a webhook request with a missing secret', () => {
   assert.equal(isWebhookAuthorized(requestWithHeaders(), 'expected-secret'), false);
 });
 
+test('fails closed when no webhook secret is configured', () => {
+  const request = requestWithHeaders({ 'x-vapi-secret': 'any-value' });
+  assert.equal(isWebhookAuthorized(request, ''), false);
+});
+
 test('rejects a webhook request with an invalid secret', () => {
   const request = requestWithHeaders({ 'x-vapi-secret': 'wrong-secret' });
   assert.equal(isWebhookAuthorized(request, 'expected-secret'), false);
@@ -147,7 +152,7 @@ test('accepts a webhook request with bearer authentication', () => {
 
 test('webhook route enforces the configured shared secret', async (t) => {
   const previousSecret = process.env.VAPI_WEBHOOK_SECRET;
-  process.env.VAPI_WEBHOOK_SECRET = 'expected-secret';
+  delete process.env.VAPI_WEBHOOK_SECRET;
 
   const server = app.listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
@@ -160,6 +165,15 @@ test('webhook route enforces the configured shared secret', async (t) => {
   const { port } = server.address();
   const url = `http://127.0.0.1:${port}/vapi-webhook`;
   const payload = JSON.stringify({ message: { type: 'status-update' } });
+
+  const unconfigured = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: payload
+  });
+  assert.equal(unconfigured.status, 503);
+
+  process.env.VAPI_WEBHOOK_SECRET = 'expected-secret';
 
   const unauthorized = await fetch(url, {
     method: 'POST',

@@ -180,7 +180,7 @@ function extractWebhookSecret(req) {
 }
 
 function isWebhookAuthorized(req, expectedSecret = process.env.VAPI_WEBHOOK_SECRET) {
-  if (!expectedSecret) return true;
+  if (!expectedSecret) return false;
 
   const receivedSecret = extractWebhookSecret(req);
   if (!receivedSecret) return false;
@@ -412,6 +412,10 @@ app.get('/health', (req, res) => {
 });
 
 app.post('/vapi-webhook', async (req, res) => {
+  if (!process.env.VAPI_WEBHOOK_SECRET) {
+    return res.status(503).json({ ok: false, error: 'Webhook authentication is not configured.' });
+  }
+
   if (!isWebhookAuthorized(req)) {
     return res.status(401).json({ ok: false, error: 'Unauthorized webhook request.' });
   }

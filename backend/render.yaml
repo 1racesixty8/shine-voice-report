@@ -9,6 +9,14 @@ services:
     envVars:
       - key: PORT
         value: 3000
+      - key: VAPI_API_KEY
+        sync: false
+      - key: VAPI_WEBHOOK_SECRET
+        sync: false
+      - key: ATTACH_CALL_RECORDINGS
+        value: "true"
+      - key: VAPI_MAX_RECORDING_BYTES
+        value: 20971520
       - key: RESEND_API_KEY
         sync: false
       - key: FROM_EMAIL

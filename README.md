@@ -129,11 +129,13 @@ SHINE may process sensitive resident and community information. Any agency opera
 - Test changes with fictional data before using them with residents.
 - Keep the emergency disclaimer clear: SHINE does not replace 911 or emergency services.
 
-## Ownership and intellectual property
+## Copyright, brand, and services
 
-Race Anderson retains all SHINE Voice Report intellectual property; DISH holds a non-exclusive license to operate this instance per the SHINE Voice Report - DISH Agreement.
+Race Anderson is the original creator of SHINE Voice Report. The code in this repository is available under the MIT License, which permits reuse, modification, distribution, and commercial use subject to the license terms.
 
-The repository's published license applies to the code released here. The SHINE name, operating materials, private configurations, agency data, production credentials, and agreement-specific rights must be handled according to their applicable ownership and contract terms.
+The MIT License does not grant rights to the SHINE Voice Report name, logo, branding, private configurations, agency data, or production credentials. It also does not include hosting, implementation, training, support, maintenance, or other paid services.
+
+Any DISH-specific deployment rights, service obligations, data-handling terms, or additional license terms are governed only by a separate written agreement between Race Anderson and DISH.
 
 ## Additional documentation
 
