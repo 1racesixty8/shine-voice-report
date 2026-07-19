@@ -70,7 +70,7 @@ Important entry points:
 
 ## Implementation status
 
-This branch sends incident-report email directly through the Resend API. The current SHINE production standard also uses Vapi's authenticated API for protected recording access; confirm the recording workflow required by the operating instance before deployment.
+This branch sends incident-report email directly through the Resend API, retrieves protected recordings through Vapi's authenticated API, and can attach recordings without exposing their storage URLs. Incoming webhook requests are validated with a shared secret when `VAPI_WEBHOOK_SECRET` is configured.
 
 ## Environment variables and API keys
 
@@ -84,7 +84,9 @@ Store all secrets in the production host's encrypted environment settings or a l
 | `RESEND_API_KEY` | Server-side credential used to send incident-report emails through Resend | Yes |
 | `FROM_EMAIL` | Verified SHINE sender name and email address | No, but configure privately |
 | `MANAGEMENT_EMAILS` | One approved recipient or a comma-separated list of management recipients | No, but contains operational contact data |
-| `VAPI_WEBHOOK_SECRET` | Optional shared secret used to validate incoming Vapi webhook requests when webhook authentication is enabled | Yes |
+| `VAPI_WEBHOOK_SECRET` | Shared secret required in `x-vapi-secret` or `Authorization: Bearer ...` for incoming webhook requests | Yes |
+| `ATTACH_CALL_RECORDINGS` | Set to `true` to retrieve and attach protected Vapi recordings | No |
+| `VAPI_MAX_RECORDING_BYTES` | Maximum recording attachment size in bytes; defaults to 20 MB | No |
 | `PORT` | Local development port; the production host may supply its own runtime port | No |
 | `NODE_ENV` | Runtime mode such as `production` | No |
 
@@ -95,7 +97,9 @@ VAPI_API_KEY=replace_with_vapi_server_key
 RESEND_API_KEY=replace_with_resend_server_key
 FROM_EMAIL="SHINE Voice Report <reports@example.org>"
 MANAGEMENT_EMAILS=manager@example.org
-VAPI_WEBHOOK_SECRET=replace_if_webhook_authentication_is_enabled
+VAPI_WEBHOOK_SECRET=replace_with_a_random_shared_secret
+ATTACH_CALL_RECORDINGS=true
+VAPI_MAX_RECORDING_BYTES=20971520
 PORT=3000
 NODE_ENV=production
 ```
@@ -108,7 +112,7 @@ NODE_ENV=production
    - `GET /health`
    - `POST /vapi-webhook`
 4. Set the Vapi assistant or phone number server URL to the production webhook address.
-5. Keep host-level access controls from blocking Vapi's webhook, or configure a supported authenticated path.
+5. Configure Vapi to send the same secret in the `x-vapi-secret` header, or as `Authorization: Bearer YOUR_SECRET`.
 6. Place a controlled test call and confirm the webhook succeeds, the report email is delivered through Resend, and protected recording access works through the authenticated Vapi API.
 7. Review production logs for failures, but do not log API keys, complete resident reports, or recording URLs unnecessarily.
 8. Treat Preview deployments as test systems and do not connect them to the live resident phone number unless explicitly intended.

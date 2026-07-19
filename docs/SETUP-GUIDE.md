@@ -21,6 +21,9 @@ The backend is a small Node/Express webhook. It receives Vapi end-of-call report
    FROM_EMAIL="SHINE Voice Reports <management-sender@example.com>"
    MANAGEMENT_EMAILS=reports@example.com
    VAPI_API_KEY=replace_with_vapi_server_key
+   VAPI_WEBHOOK_SECRET=replace_with_a_random_shared_secret
+   ATTACH_CALL_RECORDINGS=true
+   VAPI_MAX_RECORDING_BYTES=20971520
    ```
 
 4. Redeploy after adding environment variables.
@@ -31,6 +34,7 @@ The backend is a small Node/Express webhook. It receives Vapi end-of-call report
    curl https://YOUR-BACKEND-DOMAIN/health
    curl -X POST https://YOUR-BACKEND-DOMAIN/vapi-webhook \
      -H "Content-Type: application/json" \
+     -H "x-vapi-secret: YOUR_WEBHOOK_SECRET" \
      --data-binary @test-payload.json
    ```
 
@@ -45,7 +49,8 @@ The backend is a small Node/Express webhook. It receives Vapi end-of-call report
    https://YOUR-BACKEND-DOMAIN/vapi-webhook
    ```
 
-5. Make a test call and verify the report email arrives.
+5. Configure the webhook request to send the same secret in the `x-vapi-secret` header. `Authorization: Bearer YOUR_WEBHOOK_SECRET` is also accepted.
+6. Make a test call and verify the report email and protected recording attachment arrive.
 
 ## 3. Update email recipients
 
@@ -69,5 +74,6 @@ Then redeploy/restart the backend.
 
 - Never include `.env`, Resend API keys, hosting access tokens, Twilio tokens, or Vapi private keys in a handoff ZIP.
 - Store secrets only in the hosting provider's environment variable settings.
+- Use a long, random `VAPI_WEBHOOK_SECRET`, and keep it separate from the Vapi API key.
 - Use a group mailbox or distribution list for production reporting.
 - Treat transcripts as sensitive resident information.

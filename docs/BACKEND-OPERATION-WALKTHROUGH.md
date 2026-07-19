@@ -155,6 +155,9 @@ RESEND_API_KEY=replace_with_resend_server_key
 FROM_EMAIL=Example Supportive Housing Property Reports <reports@example.org>
 MANAGEMENT_EMAILS=reports@example.org
 VAPI_API_KEY=replace_with_vapi_server_key
+VAPI_WEBHOOK_SECRET=replace_with_a_random_shared_secret
+ATTACH_CALL_RECORDINGS=true
+VAPI_MAX_RECORDING_BYTES=20971520
 ```
 
 The email currently goes to:
@@ -224,6 +227,7 @@ Send a test report:
 ```bash
 curl -X POST https://your-backend-domain.example/vapi-webhook \
   -H "Content-Type: application/json" \
+  -H "x-vapi-secret: YOUR_WEBHOOK_SECRET" \
   --data-binary @test-payload.json
 ```
 

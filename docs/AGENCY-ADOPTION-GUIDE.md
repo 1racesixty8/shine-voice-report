@@ -44,6 +44,9 @@ Set:
 RESEND_API_KEY=replace_with_resend_server_key
 FROM_EMAIL="SHINE Voice Reports <reports@example.org>"
 MANAGEMENT_EMAILS=manager@example.org
+VAPI_API_KEY=replace_with_vapi_server_key
+VAPI_WEBHOOK_SECRET=replace_with_a_random_shared_secret
+ATTACH_CALL_RECORDINGS=true
 ```
 
 ## 6. Connect Vapi to the backend
@@ -54,6 +57,8 @@ Set the assistant or phone number Server URL to:
 https://your-backend-domain.example/vapi-webhook
 ```
 
+Configure Vapi's webhook request to send the same secret in the `x-vapi-secret` header, or as a Bearer authorization value.
+
 ## 7. Test before launch
 
 Test:
@@ -62,6 +67,7 @@ Test:
 - Assistant asks the right questions
 - End-of-call webhook fires
 - Email arrives
+- Approved recording attachment arrives through authenticated Vapi access
 - Transcript and summary are useful
 - 911 disclaimer is clear
 
