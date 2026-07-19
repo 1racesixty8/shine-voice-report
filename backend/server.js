@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import fs from 'node:fs/promises';
 import process from 'node:process';
 
@@ -163,26 +163,18 @@ ${asText(report.structuredData)}
 `;
 }
 
-function createTransporter() {
-  const required = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'FROM_EMAIL', 'MANAGEMENT_EMAILS'];
+function createResendClient() {
+  const required = ['RESEND_API_KEY', 'FROM_EMAIL', 'MANAGEMENT_EMAILS'];
   const missing = required.filter((key) => !process.env[key]);
   if (missing.length) {
     throw new Error(`Missing email environment variables: ${missing.join(', ')}`);
   }
 
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: Number(process.env.SMTP_PORT) === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
+  return new Resend(process.env.RESEND_API_KEY);
 }
 
 async function sendIncidentEmail(report) {
-  const transporter = createTransporter();
+  const resend = createResendClient();
   const subject = buildSubject(report);
   const text = buildEmailBody(report);
 
@@ -194,12 +186,22 @@ async function sendIncidentEmail(report) {
 
   console.log(`Sending incident report ${report.reportId} to ${recipients.join(', ')}`);
 
-  return transporter.sendMail({
+  const { data, error } = await resend.emails.send({
     from: process.env.FROM_EMAIL,
     to: recipients,
     subject,
     text
   });
+
+  if (error) {
+    const resendError = new Error(error.message || 'Resend failed to send the incident report email.');
+    resendError.name = 'ResendError';
+    resendError.code = error.name || 'resend_error';
+    resendError.response = JSON.stringify(error);
+    throw resendError;
+  }
+
+  return { messageId: data?.id };
 }
 
 app.get('/health', (req, res) => {

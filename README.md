@@ -70,9 +70,7 @@ Important entry points:
 
 ## Implementation status
 
-The `main` branch contains an older public reference backend. The current SHINE production standard uses Resend for email delivery and Vapi's authenticated API for protected recording access.
-
-This README documents the current production handoff architecture. Before deploying this repository as the operating instance, confirm that the Resend and authenticated Vapi changes are present in the deployment branch. Do not deploy the older email path as the production configuration.
+This branch sends incident-report email directly through the Resend API. The current SHINE production standard also uses Vapi's authenticated API for protected recording access; confirm the recording workflow required by the operating instance before deployment.
 
 ## Environment variables and API keys
 
