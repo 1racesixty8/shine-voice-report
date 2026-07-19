@@ -70,7 +70,7 @@ Important entry points:
 
 ## Implementation status
 
-This branch sends incident-report email directly through the Resend API, retrieves protected recordings through Vapi's authenticated API, and can attach recordings without exposing their storage URLs. Incoming webhook requests are validated with a shared secret when `VAPI_WEBHOOK_SECRET` is configured.
+This branch sends incident-report email directly through the Resend API, retrieves protected recordings through Vapi's authenticated API, and can attach recordings without exposing their storage URLs. The webhook rejects requests unless `VAPI_WEBHOOK_SECRET` is configured and the request supplies the matching secret.
 
 ## Environment variables and API keys
 
