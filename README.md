@@ -21,6 +21,17 @@ The production workflow has four main parts:
 3. **Email delivery through Resend** — The backend formats a readable incident report and sends it from the approved SHINE sender domain to the configured management inboxes.
 4. **Production hosting** — An agency-controlled Node-compatible host runs the webhook and health endpoints and stores the server-side environment variables.
 
+### Current SHINE pilot deployment
+
+As of July 20, 2026, the active SHINE pilot uses:
+
+- **Vercel** to host the production webhook and health endpoint;
+- **Resend** to send incident-report emails;
+- a private **Vapi server key** for protected call and recording access; and
+- a separate webhook credential shared only by Vapi and Vercel.
+
+The live webhook rejects requests that do not have the matching credential. The detailed production decision and verification record is in `SHINE_HOSTING_STATUS.md`.
+
 ```text
 Resident phone call or QR code
         |
@@ -143,6 +154,7 @@ Any DISH-specific deployment rights, service obligations, data-handling terms, o
 - `docs/BACKEND-OPERATION-WALKTHROUGH.md`
 - `docs/CONFIGURATION-CHECKLIST.md`
 - `docs/AGENCY-ADOPTION-GUIDE.md`
+- `docs/DISH-HANDOFF-STATUS.md`
 - `SECURITY.md`
 - `CONTRIBUTING.md`
 
