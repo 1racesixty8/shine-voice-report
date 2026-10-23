@@ -4,6 +4,9 @@ import { Resend } from 'resend';
 import fs from 'node:fs/promises';
 import process from 'node:process';
 import { timingSafeEqual } from 'node:crypto';
+import { getManagementRecipients, getReportRoutingStatus, warnIfReportRoutingMissing } from './report-routing.js';
+
+warnIfReportRoutingMissing();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -357,9 +360,7 @@ async function sendIncidentEmail(report, options = {}) {
   const resend = options.resendClient || createResendClient();
   const subject = buildSubject(report);
 
-  const recipients = process.env.MANAGEMENT_EMAILS.split(',')
-    .map((email) => email.trim())
-    .filter(Boolean);
+  const recipients = getManagementRecipients();
 
   if (!recipients.length) throw new Error('MANAGEMENT_EMAILS must include at least one recipient.');
 
@@ -408,7 +409,13 @@ async function sendIncidentEmail(report, options = {}) {
 }
 
 app.get('/health', (req, res) => {
-  res.json({ ok: true, service: 'shine-voice-report-webhook', timestamp: new Date().toISOString() });
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    ok: true,
+    service: 'shine-voice-report-webhook',
+    timestamp: new Date().toISOString(),
+    reportRouting: getReportRoutingStatus()
+  });
 });
 
 app.post('/vapi-webhook', async (req, res) => {
